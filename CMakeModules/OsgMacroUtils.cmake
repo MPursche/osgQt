@@ -267,9 +267,25 @@ MACRO(SETUP_PLUGIN PLUGIN_NAME)
 
     ## plugins gets put in libopenscenegraph by default
     IF(${ARGC} GREATER 1)
-      SET(PACKAGE_COMPONENT libopenscenegraph-${ARGV1})
+      SET(PACKAGE_COMPONENT libosgqt-${ARGV1})
+      # add cpack config variables for plugin with own package
+      IF(BUILD_OSG_PACKAGES)
+       IF(${CPACK_GENERATOR} STREQUAL "DEB")
+           STRING(TOUPPER ${PACKAGE_COMPONENT} UPPER_PACKAGE_COMPONENT)
+           SET(CPACK_${UPPER_PACKAGE_COMPONENT}_DEPENDENCIES
+               "libosgqt"
+               CACHE STRING
+               "Dependend packages for the ${PACKAGE_COMPONENT} package with all components (uses deb dependecy format), e.g., 'libc6, libcurl3-gnutls, libgif4, libjpeg8, libpng12-0'"
+            )
+            SET(CPACK_${UPPER_PACKAGE_COMPONENT}_CONFLICTS
+                ""
+                CACHE STRING
+                "Conflicting packages for the ${PACKAGE_COMPONENT} package (uses deb dependecy format), e.g., 'libc6, libcurl3-gnutls, libgif4, libjpeg8, libpng12-0'"
+            )
+        ENDIF()
+      ENDIF()
     ELSE(${ARGC} GREATER 1)
-      SET(PACKAGE_COMPONENT libopenscenegraph)
+      SET(PACKAGE_COMPONENT libosgqt)
     ENDIF(${ARGC} GREATER 1)
 
     # Add the VisualStudio versioning info
@@ -463,9 +479,9 @@ MACRO(SETUP_EXAMPLE EXAMPLE_NAME)
         IF(APPLE)
             INSTALL(TARGETS ${TARGET_TARGETNAME} RUNTIME DESTINATION share/OpenSceneGraph/bin BUNDLE DESTINATION share/OpenSceneGraph/bin )
         ELSE(APPLE)
-            INSTALL(TARGETS ${TARGET_TARGETNAME} RUNTIME DESTINATION share/OpenSceneGraph/bin COMPONENT openscenegraph-examples )
+            INSTALL(TARGETS ${TARGET_TARGETNAME} RUNTIME DESTINATION share/OpenSceneGraph/bin COMPONENT osgqt-examples)
             IF(MSVC AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
-                INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_TARGETNAME}${CMAKE_BUILD_POSTFIX}.pdb DESTINATION share/OpenSceneGraph/bin COMPONENT openscenegraph-examples)
+                INSTALL(FILES ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_TARGETNAME}${CMAKE_BUILD_POSTFIX}.pdb DESTINATION share/OpenSceneGraph/bin COMPONENT osgqt-examples)
             ENDIF(MSVC AND NOT CMAKE_BUILD_TYPE STREQUAL "Release")
         ENDIF(APPLE)
 

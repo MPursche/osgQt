@@ -77,7 +77,57 @@ IF(NOT CPACK_COMPONENTS_ALL)
   # cmake 2.6.0 don't supply the COMPONENTS property.
   # I set it manually to be the packages that can always be packaged
   MESSAGE("When building packages please consider using cmake version 2.6.1 or above")
-  SET(CPACK_COMPONENTS_ALL libopenscenegraph libopenthreads openscenegraph libopenscenegraph-dev libopenthreads-dev)
+  SET(CPACK_COMPONENTS_ALL libosgqt libostqt-dev)
+ENDIF()
+
+# cpack configuration for debian packages
+IF(${CPACK_GENERATOR} STREQUAL "DEB")
+    SET(OSGQT_PACKAGE_MAINTAINER
+        ""
+        CACHE STRING
+        "Name and email address of the package maintainer, e.g., 'Jon Doe <jon.doe@superawesomemail.com>'"
+    )
+    SET(CPACK_OSGQT-ALL_DEPENDENCIES
+        "libopenscenegraph"
+        CACHE STRING
+        "Dependend packages for the osgQt package (uses deb dependecy format), e.g., 'libc6, libcurl3-gnutls, libgif4, libjpeg8, libpng12-0'"
+    )
+    SET(CPACK_LIBOSGQT_DEPENDENCIES
+        "libopenscenegraph"
+        CACHE STRING
+        "Dependend packages for the osgQt library package (uses deb dependecy format), e.g., 'libc6, libcurl3-gnutls, libgif4, libjpeg8, libpng12-0'"
+    )    
+    SET(CPACK_LIBOSGQT-DEV_DEPENDENCIES
+        "libosgqt-dev"
+        CACHE STRING
+        "Dependend packages for the osgQt development package (uses deb dependecy format), e.g., 'libc6, libcurl3-gnutls, libgif4, libjpeg8, libpng12-0'"
+    )
+    SET(CPACK_OSGQT-EXAMPLES_DEPENDENCIES
+        "libosgqt"
+        CACHE STRING
+        "Dependend packages for the osgQt examples package (uses deb dependecy format), e.g., 'libc6, libcurl3-gnutls, libgif4, libjpeg8, libpng12-0'"
+    )
+
+    SET(CPACK_OSGQT-ALL_CONFLICTS
+        "libopenscenegraph"
+        CACHE STRING
+        "Conflicting packages for the osgQt package (uses deb dependecy format), e.g., 'libc6, libcurl3-gnutls, libgif4, libjpeg8, libpng12-0'"
+    )
+    SET(CPACK_LIBOSGQT_CONFLICTS
+            ""
+            CACHE STRING
+            "Conflicting packages for the osgQt library package (uses deb dependecy format), e.g., 'libc6, libcurl3-gnutls, libgif4, libjpeg8, libpng12-0'"
+    )
+    SET(CPACK_LIBOSGQT-DEV_CONFLICTS
+            ""
+            CACHE STRING
+            "Conflicting packages for the osgQt development package (uses deb dependecy format), e.g., 'libc6, libcurl3-gnutls, libgif4, libjpeg8, libpng12-0'"
+    )
+    SET(CPACK_OSGQT-EXAMPLES_CONFLICTS
+        ""
+        CACHE STRING
+        "Conflicting packages for the osgQt examples package (uses deb dependecy format), e.g., 'libc6, libcurl3-gnutls, libgif4, libjpeg8, libpng12-0'"
+    )
 ENDIF()
 
 # Create a target that will be used to generate all packages defined below
@@ -86,6 +136,14 @@ ADD_CUSTOM_TARGET(${PACKAGE_ALL_TARGETNAME})
 
 MACRO(GENERATE_PACKAGING_TARGET package_name)
     SET(CPACK_PACKAGE_NAME ${package_name})
+    
+    # set debian dependencies AND conflicts
+    IF(${CPACK_GENERATOR} STREQUAL "DEB")
+        STRING(TOUPPER CPACK_${package_name}_DEPENDENCIES DEPENDENCIES_VAR)
+        STRING(TOUPPER CPACK_${package_name}_CONFLICTS CONFLICTS_VAR)
+        SET(OSG_PACKAGE_DEPENDS "${${DEPENDENCIES_VAR}}")
+        SET(OSG_PACKAGE_CONFLICTS "${${CONFLICTS_VAR}}")
+    ENDIF()
 
     # the doc packages don't need a system-arch specification
     IF(${package} MATCHES -doc)
@@ -97,7 +155,7 @@ MACRO(GENERATE_PACKAGING_TARGET package_name)
         ENDIF()
     ENDIF()
 
-    CONFIGURE_FILE("${OpenSceneGraph_SOURCE_DIR}/CMakeModules/OsgCPackConfig.cmake.in" "${OpenSceneGraph_BINARY_DIR}/CPackConfig-${package_name}.cmake" IMMEDIATE)
+    CONFIGURE_FILE("${osgQt_SOURCE_DIR}/CMakeModules/OsgCPackConfig.cmake.in" "${osgQt_BINARY_DIR}/CPackConfig-${package_name}.cmake" IMMEDIATE)
 
     SET(PACKAGE_TARGETNAME "${PACKAGE_TARGET_PREFIX}${package_name}")
 
@@ -121,13 +179,13 @@ MACRO(GENERATE_PACKAGING_TARGET package_name)
     SET_TARGET_PROPERTIES(${PACKAGE_TARGETNAME} PROPERTIES FOLDER "Packaging")
 
     ADD_CUSTOM_COMMAND(TARGET ${PACKAGE_TARGETNAME}
-        COMMAND ${CMAKE_CPACK_COMMAND} -C ${OSG_CPACK_CONFIGURATION} --config ${OpenSceneGraph_BINARY_DIR}/CPackConfig-${package_name}.cmake
+        COMMAND ${CMAKE_CPACK_COMMAND} -C ${OSG_CPACK_CONFIGURATION} --config ${osgQt_BINARY_DIR}/CPackConfig-${package_name}.cmake
         COMMENT "Run CPack packaging for ${package_name}..."
     )
     # Add the exact same custom command to the all package generating target. 
     # I can't use add_dependencies to do this because it would allow parallell building of packages so am going brute here
     ADD_CUSTOM_COMMAND(TARGET ${PACKAGE_ALL_TARGETNAME}
-        COMMAND ${CMAKE_CPACK_COMMAND} -C ${OSG_CPACK_CONFIGURATION} --config ${OpenSceneGraph_BINARY_DIR}/CPackConfig-${package_name}.cmake
+        COMMAND ${CMAKE_CPACK_COMMAND} -C ${OSG_CPACK_CONFIGURATION} --config ${osgQt_BINARY_DIR}/CPackConfig-${package_name}.cmake
     )
     SET_TARGET_PROPERTIES(${PACKAGE_ALL_TARGETNAME} PROPERTIES FOLDER "Packaging")
 
@@ -135,7 +193,7 @@ ENDMACRO(GENERATE_PACKAGING_TARGET)
 
 # Create configs and targets for a package including all components
 SET(OSG_CPACK_COMPONENT ALL)
-GENERATE_PACKAGING_TARGET(openscenegraph-all)
+GENERATE_PACKAGING_TARGET(osgQt-all)
 
 # Create configs and targets for each component
 FOREACH(package ${CPACK_COMPONENTS_ALL})

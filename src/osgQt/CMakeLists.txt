@@ -11,7 +11,7 @@ IF ( Qt5Widgets_FOUND )
 ELSE()
     SET(LIB_NAME osgQt)
 ENDIF()
-SET(HEADER_PATH ${OpenSceneGraph_SOURCE_DIR}/include/osgQt)
+SET(HEADER_PATH ${osgQt_SOURCE_DIR}/include/osgQt)
 
 SET(SOURCES_H
     ${HEADER_PATH}/QGraphicsViewAdapter

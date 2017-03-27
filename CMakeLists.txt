@@ -146,11 +146,11 @@ ENDIF()
 # We want to build SONAMES shared librariess
 SET(OPENSCENEGRAPH_SONAMES TRUE)
 
-SET(OpenSceneGraph_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+SET(osgQt_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
 # We have some custom .cmake scripts not in the official distribution.
 # Maybe this can be used override existing behavior if needed?
-SET(CMAKE_MODULE_PATH "${OpenSceneGraph_SOURCE_DIR}/CMakeModules;${CMAKE_MODULE_PATH}")
+SET(CMAKE_MODULE_PATH "${osgQt_SOURCE_DIR}/CMakeModules;${CMAKE_MODULE_PATH}")
 
 # Change the default build type to Release
 IF(NOT CMAKE_BUILD_TYPE)
@@ -304,7 +304,7 @@ ENDIF()
 
 INCLUDE_DIRECTORIES(
     ${OPENSCENEGRAPH_INCLUDE_DIRS}
-    ${OpenSceneGraph_SOURCE_DIR}/include
+    ${osgQt_SOURCE_DIR}/include
     ${OPENGL_INCLUDE_DIR}
 )
 
@@ -838,7 +838,7 @@ IF(BUILD_DOCUMENTATION)
 
     OPTION(BUILD_REF_DOCS_TAGFILE "Generate a tag file named osg.tag on the documentation web server" OFF)
     IF(BUILD_REF_DOCS_TAGFILE)
-        SET(GENERATE_TAGFILE "${OpenSceneGraph_BINARY_DIR}/doc/OpenSceneGraphReferenceDocs/osg.tag")
+        SET(GENERATE_TAGFILE "${osgQt_BINARY_DIR}/doc/OpenSceneGraphReferenceDocs/osg.tag")
     ELSE()
         SET(GENERATE_TAGFILE "")
     ENDIF()
@@ -875,7 +875,7 @@ IF(BUILD_DOCUMENTATION)
 
     # now set up openthreads documentation generation
     IF(BUILD_REF_DOCS_TAGFILE)
-        SET(GENERATE_TAGFILE "${OpenSceneGraph_BINARY_DIR}/doc/OpenThreadsReferenceDocs/ot.tag")
+        SET(GENERATE_TAGFILE "${osgQt_BINARY_DIR}/doc/OpenThreadsReferenceDocs/ot.tag")
     ENDIF()
 
     # This processes our openthreads.doxyfile.cmake and generate a final doxyfile
