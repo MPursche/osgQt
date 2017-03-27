@@ -193,7 +193,7 @@ ENDMACRO(GENERATE_PACKAGING_TARGET)
 
 # Create configs and targets for a package including all components
 SET(OSG_CPACK_COMPONENT ALL)
-GENERATE_PACKAGING_TARGET(osgQt-all)
+GENERATE_PACKAGING_TARGET(osgqt-all)
 
 # Create configs and targets for each component
 FOREACH(package ${CPACK_COMPONENTS_ALL})
